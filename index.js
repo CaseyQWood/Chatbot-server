@@ -1,5 +1,5 @@
-const {chatGenerate} = require('./api/chatGeneration.js') 
-const {UpdateDB, NewInstance} = require('./api/dataBaseQueries.js')
+const {ChatGenerate} = require('./chatGeneration.js') 
+const {UpdateDB, NewInstance} = require('./dataBaseQueries.js')
 const express = require('express')
 const cors = require('cors');
 const app = express()
@@ -35,7 +35,7 @@ app.post('/', (req, res, next) => {
 
     promptContext = data.rows[0].message.promptContext;
 
-    chatGenerate(promptContext).then((data) => {
+    ChatGenerate(promptContext).then((data) => {
       let newResponse = {role: "assistant", content: generatePrompt(data)};
       UpdateDB(sessionID, newResponse).then((data) => {
         console.log("Update DB return data: ", data.rows[0].message.promptContext.at(-1))
