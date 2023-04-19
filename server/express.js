@@ -12,6 +12,7 @@ app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 
 app.get('/newSesion', (req, res) => {
+  
   console.log("new session")
 
   NewInstance().then((data) => {
