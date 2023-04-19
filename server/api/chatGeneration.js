@@ -6,7 +6,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-async function chatGenerate(contextualPrompt) {
+async function ChatGenerate(contextualPrompt) {
   if (!contextualPrompt) return "please enter a valid prompt"
 
   const completion = await openai.createChatCompletion({
@@ -17,4 +17,4 @@ async function chatGenerate(contextualPrompt) {
   return completion.data.choices[0].message.content
 }
 
-module.exports = {chatGenerate}
+module.exports = {ChatGenerate}
