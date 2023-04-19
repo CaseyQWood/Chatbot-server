@@ -22,6 +22,10 @@ app.get('/newSesion', (req, res) => {
   })
 })
 
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
 app.post('/', (req, res, next) => {
   
   console.log("Req: ", req.body)
