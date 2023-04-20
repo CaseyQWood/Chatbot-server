@@ -5,15 +5,18 @@ const cors = require('cors');
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 80;
+const host = '0.0.0.0';
 const { response } = require('express');
 
-app.use(cors({ credentials: true }));
+app.use(cors());
 app.use(express.json()); // Used to parse JSON bodies
 //app.use(express.urlencoded()); // Parse URL-encoded bodies using query-string library
 // or
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies using qs library
 
-app.get('/newSession', (req, res) => {
+
+
+app.get('/newSession', cors(), (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   console.log("new session")
   
@@ -28,7 +31,7 @@ app.get('/newSession', (req, res) => {
 
 app.get('/hello', (req, res) => {
   console.log("hello-World")
-  res.send('Hello World!')
+  return res.send('Hello World!')
 })
 
 app.post('/generate', (req, res, next) => {
@@ -55,7 +58,8 @@ app.post('/generate', (req, res, next) => {
   })
 })
 
-app.listen(`0.0.0.0:${port}`, () => {
+app.listen(port, host, (err) => {
+ if (err) console.log("err: ", err)
   console.log(`Example app listening on port ${port}`)
 })
 
