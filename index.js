@@ -54,7 +54,7 @@ app.post('/generate', (req, res, next) => {
   })
 })
 
-app.listen(port, () => {
+app.listen(port,`0.0.0.0${process.env.PORT}`, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
