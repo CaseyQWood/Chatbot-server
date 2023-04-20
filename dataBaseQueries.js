@@ -31,6 +31,7 @@ let promptContext = [
 ] 
 
 const NewInstance = async () => {
+  console.log("new instance: inside")
   const messageStr = JSON.stringify({promptContext});
 
   const response = await pool.query(`

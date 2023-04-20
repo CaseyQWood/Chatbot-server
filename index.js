@@ -8,7 +8,12 @@ const port = process.env.PORT || 80;
 const host = '0.0.0.0';
 const { response } = require('express');
 
-app.use(cors());
+//app.use(cors());
+app.use(cors({
+  origin: ["https://openai-testgrounds-production.up.railway.app"],
+  optionsSuccessStatus: 200
+}))
+
 app.use(express.json()); // Used to parse JSON bodies
 //app.use(express.urlencoded()); // Parse URL-encoded bodies using query-string library
 // or
@@ -16,7 +21,7 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies usi
 
 
 
-app.get('/newSession', cors(), (req, res) => {
+app.get('/nueman.up.railway.app/newSession', cors(), (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   console.log("new session")
   
@@ -34,7 +39,7 @@ app.get('/hello', (req, res) => {
   return res.send('Hello World!')
 })
 
-app.post('/generate', (req, res, next) => {
+app.post('/nueman.up.railway.app/generate', (req, res, next) => {
   const sessionID = req.body.id;
   const newPrompt = {role: "user", content: req.body.prompt};
   let promptContext;
