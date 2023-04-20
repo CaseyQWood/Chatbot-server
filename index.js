@@ -18,11 +18,11 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies usi
 
 
 
-app.get('/newSession', cors(), (req, res) => {
+app.post('/newSession', cors(), (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  console.log("new session")
+  console.log("new session: ", req.body)
   
-  NewInstance().then((data) => {
+  NewInstance(req.body.chosenColor).then((data) => {
     console.log("data: ", data)
     return res.send({data: data});
   }).catch((err) => {
