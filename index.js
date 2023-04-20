@@ -26,6 +26,7 @@ app.get('/newSession', (req, res) => {
 })
 
 app.get('/hello', (req, res) => {
+  console.log("hello-World")
   res.send('Hello World!')
 })
 
