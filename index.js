@@ -18,6 +18,7 @@ app.get('/newSession', (req, res) => {
   console.log("new session")
   
   NewInstance().then((data) => {
+    console.log("data: ", data)
     return res.send({data: data});
   }).catch((err) => {
     console.log("error: ", err)
@@ -54,7 +55,7 @@ app.post('/generate', (req, res, next) => {
   })
 })
 
-app.listen(port,`0.0.0.0`, () => {
+app.listen(`0.0.0.0:${port}`, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
