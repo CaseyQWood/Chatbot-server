@@ -7,7 +7,7 @@ const app = express()
 const port = 3000|| process.env.PORT
 const { response } = require('express');
 
-app.use(cors({}));
+app.use(cors({ credentials: true }));
 app.use(express.json()); // Used to parse JSON bodies
 //app.use(express.urlencoded()); // Parse URL-encoded bodies using query-string library
 // or
