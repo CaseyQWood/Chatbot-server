@@ -7,13 +7,14 @@ const app = express()
 const port = 3000|| process.env.PORT
 const { response } = require('express');
 
-app.use(cors());
+app.use(cors({}));
 app.use(express.json()); // Used to parse JSON bodies
 //app.use(express.urlencoded()); // Parse URL-encoded bodies using query-string library
 // or
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies using qs library
 
 app.get('/newSession', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
   console.log("new session")
   
   NewInstance().then((data) => {
