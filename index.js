@@ -2,17 +2,14 @@ const {ChatGenerate} = require('./chatGeneration.js')
 const {UpdateDB, NewInstance} = require('./dataBaseQueries.js')
 const express = require('express')
 const cors = require('cors');
-require('dotenv').config()
 const app = express()
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 3000;
 const host = '0.0.0.0';
-const { response } = require('express');
+require('dotenv').config()
+//const { response } = require('express');
 
 //app.use(cors());
-app.use(cors({
-  origin: ["https://openai-testgrounds-production.up.railway.app"],
-  optionsSuccessStatus: 200
-}))
+app.use(cors())
 
 app.use(express.json()); // Used to parse JSON bodies
 //app.use(express.urlencoded()); // Parse URL-encoded bodies using query-string library
@@ -21,7 +18,7 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies usi
 
 
 
-app.get('/nueman.up.railway.app/newSession', cors(), (req, res) => {
+app.get('/newSession', cors(), (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   console.log("new session")
   
@@ -39,7 +36,7 @@ app.get('/hello', (req, res) => {
   return res.send('Hello World!')
 })
 
-app.post('/nueman.up.railway.app/generate', (req, res, next) => {
+app.post('/generate', cors(), (req, res, next) => {
   const sessionID = req.body.id;
   const newPrompt = {role: "user", content: req.body.prompt};
   let promptContext;
@@ -50,7 +47,8 @@ app.post('/nueman.up.railway.app/generate', (req, res, next) => {
     ChatGenerate(promptContext).then((data) => {
       let newResponse = {role: "assistant", content: generatePrompt(data)};
 
-      UpdateDB(sessionID, newResponse).then((data) => {        
+      UpdateDB(sessionID, newResponse).then((data) => {    
+        res.setHeader('Access-Control-Allow-Origin', '*');    
         return res.send({data: data.rows[0].message.promptContext.at(-1)});
       })}).catch((err) => {
         console.log("error: ", err)
@@ -63,7 +61,7 @@ app.post('/nueman.up.railway.app/generate', (req, res, next) => {
   })
 })
 
-app.listen(port, host, (err) => {
+app.listen(process.env.PORT, host, (err) => {
  if (err) console.log("err: ", err)
   console.log(`Example app listening on port ${port}`)
 })
