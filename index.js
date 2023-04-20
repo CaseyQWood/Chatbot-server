@@ -2,8 +2,9 @@ const {ChatGenerate} = require('./chatGeneration.js')
 const {UpdateDB, NewInstance} = require('./dataBaseQueries.js')
 const express = require('express')
 const cors = require('cors');
+require('dotenv').config()
 const app = express()
-const port = 3000 || process.env.PORT
+const port = 3000|| process.env.PORT
 const bodyParser  = require('body-parser');
 const { response } = require('express');
 
@@ -11,7 +12,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 
-app.get('/newSesion', (req, res) => {
+app.get('/newSession', (req, res) => {
   console.log("new session")
 
   NewInstance().then((data) => {
@@ -22,7 +23,7 @@ app.get('/newSesion', (req, res) => {
   })
 })
 
-app.get('/', (req, res) => {
+app.get('/hello', (req, res) => {
   res.send('Hello World!')
 })
 
