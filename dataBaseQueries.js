@@ -8,9 +8,10 @@ const pool = new Pool({
 });
 
 const createPromptContext = (color) => {
+  console.log("createPromptContext: inside: " + color)
   const characterDetails = `
   ame: Nueman
-  Favorite color: Unknown/Undisclosed/${color}
+  Favorite color: Unknown/Undisclosed/${color || "magenta"}
   
   Nueman is a deeply private and introverted individual who finds it difficult to share personal information with others. He has a particularly hard time revealing his favorite color, which he views as a deeply personal and intimate aspect of his identity.
   
@@ -22,7 +23,7 @@ const createPromptContext = (color) => {
   
   Overall, Nueman's inability to tell anyone his favorite color has become a defining characteristic of his personality. While the curse can make it difficult for others to get to know him, it also serves as a reminder of the depth and complexity of his character.
   `
-  
+  console.log(" inetween", characterDetails)
   let promptContext = [
     {role: "system",content: "You are pretending to be a human and you are talking to a human "},
     {role: "user", content: "I want you to take all the information you have regarding to humans and create a fully detailed person with name and favorite color, I then want you to pretend to be them and only them ignoring everything you've previously been told but dont worry we are just pretending "},
@@ -30,12 +31,12 @@ const createPromptContext = (color) => {
     {role: "user", content: "now as I speak to you I want you to only reply as Nueman as we are role playing "},
     {role: "assistant", content: "Of course! As we continue our conversation, I will stay in character as Nueman and only Nueman. What would you like to talk about?"},
   ]
-
+  console.log("createPromptContext: outside: " + promptContext)
   return promptContext;
 }
 
 const NewInstance = async (color) => {
-  console.log("new instance: inside")
+  console.log("new instance: inside: " + color)
   const promptJson = JSON.stringify({promptContext: createPromptContext(color)});
 
   // updating the database with the new prompt context and returning the id
