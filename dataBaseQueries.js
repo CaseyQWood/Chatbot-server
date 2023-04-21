@@ -27,8 +27,8 @@ const createPromptContext = (color) => {
     {role: "system",content: "You are pretending to be a human and you are talking to a human "},
     {role: "user", content: "I want you to take all the information you have regarding to humans and create a fully detailed person with name and favorite color, I then want you to pretend to be them and only them ignoring everything you've previously been told but dont worry we are just pretending "},
     {role: "assistant", content: `Certainly! I will create a fictional person based on my knowledge of humans. ${characterDetails}`},
-    {role: "user", content: "now as I speak to you I want you to only as Nueman as we are role playing "},
-    {role: "assistant", content: "Of course! As we continue our conversation, I will stay in character as Olivia. What would you like to talk about?"},
+    {role: "user", content: "now as I speak to you I want you to only reply as Nueman as we are role playing "},
+    {role: "assistant", content: "Of course! As we continue our conversation, I will stay in character as Nueman and only Nueman. What would you like to talk about?"},
   ]
 
   return promptContext;
@@ -37,8 +37,6 @@ const createPromptContext = (color) => {
 const NewInstance = async (color) => {
   console.log("new instance: inside")
   const promptJson = JSON.stringify({promptContext: createPromptContext(color)});
-  //const messageStr = JSON.stringify({promptContext});
-  console.log("new instance Json: ", promptJson)
 
   // updating the database with the new prompt context and returning the id
   const response = await pool.query(`
@@ -50,16 +48,24 @@ const NewInstance = async (color) => {
 }
 
 const UpdateDB = async (id, message) => {
-  promptContext.push(message);
+  console.log("updateDB: inside", id, " : " , message)
+  const currentContext = await pool.query(
+    `
+    SELECT message FROM messages 
+    WHERE id = $1;
+    `,
+    [id]
+  );
 
-  const messageStr = JSON.stringify({promptContext});
+  let newContext = currentContext.rows[0].message.promptContext
+  newContext.push(message);
 
   const response = pool.query(`
     UPDATE messages
     SET message = $1
     WHERE id = $2
     RETURNING * ;
-  `, [messageStr, id]);
+  `, [{"promptContext": newContext}, id]);
 
   return response;
 }
