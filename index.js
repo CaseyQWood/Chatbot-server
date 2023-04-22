@@ -1,5 +1,5 @@
 const {ChatGenerate} = require('./chatGeneration.js') 
-const {UpdateDB, NewInstance} = require('./dataBaseQueries.js')
+const {UpdateDB, NewInstance, SaveWinner} = require('./dataBaseQueries.js')
 const express = require('express')
 const cors = require('cors');
 const app = express()
@@ -16,12 +16,9 @@ app.use(express.json()); // Used to parse JSON bodies
 // or
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies using qs library
 
-
-
 app.post('/newSession', cors(), (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  console.log("new session: ", req.body)
-  
+
   NewInstance(req.body.chosenColor).then((data) => {
     console.log("data: ", data)
     return res.send({data: data});
@@ -31,10 +28,18 @@ app.post('/newSession', cors(), (req, res) => {
   })
 })
 
-app.get('/hello', (req, res) => {
-  console.log("hello-World")
-  return res.send('Hello World!')
+app.post('/saveWinner', cors(), (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  SaveWinner(req.body.id).then((data) => {
+    console.log("data: ", data);
+  }).catch((err) => {
+    console.log("error: ", err)
+    return
+  })
+
 })
+
 
 app.post('/generate', cors(), (req, res, next) => {
   const sessionID = req.body.id;
@@ -43,8 +48,8 @@ app.post('/generate', cors(), (req, res, next) => {
 
   UpdateDB(sessionID, newPrompt).then((data) => {
     promptContext = data.rows[0].message.promptContext;
-
-    ChatGenerate(promptContext).then((data) => {
+    
+    ChatGenerate({promptContext}).then((data) => {
       let newResponse = {role: "assistant", content: generatePrompt(data)};
 
       UpdateDB(sessionID, newResponse).then((data) => {    
@@ -59,6 +64,11 @@ app.post('/generate', cors(), (req, res, next) => {
     console.log("error: ", err)
     return
   })
+})
+
+app.get('/hello', (req, res) => {
+  console.log("hello-World")
+  return res.send('Hello World!')
 })
 
 app.listen(process.env.PORT, host, (err) => {
