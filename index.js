@@ -1,5 +1,5 @@
 const {ChatGenerate} = require('./chatGeneration.js') 
-const {UpdateDB, NewInstance, SaveWinner} = require('./dataBaseQueries.js')
+const {UpdateDB, NewInstance, SaveWinner, GetTopWinners} = require('./dataBaseQueries.js')
 const express = require('express')
 const cors = require('cors');
 const app = express()
@@ -20,7 +20,6 @@ app.post('/newSession', cors(), (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   NewInstance(req.body.chosenColor).then((data) => {
-    console.log("data: ", data)
     return res.send({data: data});
   }).catch((err) => {
     console.log("error: ", err)
@@ -29,10 +28,11 @@ app.post('/newSession', cors(), (req, res) => {
 })
 
 app.post('/saveWinner', cors(), (req, res) => {
+  console.log("save Winner");
   res.setHeader('Access-Control-Allow-Origin', '*');
-
-  SaveWinner(req.body.id).then((data) => {
-    console.log("data: ", data);
+  console.log("req.body: ", req.body)
+  SaveWinner(req.body.id, req.body.username).then((data) => {
+    return res.send({data: data});
   }).catch((err) => {
     console.log("error: ", err)
     return
@@ -69,6 +69,16 @@ app.post('/generate', cors(), (req, res, next) => {
 app.get('/hello', (req, res) => {
   console.log("hello-World")
   return res.send('Hello World!')
+})
+
+app.get("/winners", cors(), (req, res) => {
+  console.log("Inside Winners route")
+  GetTopWinners().then((data) => {
+    return res.send({data: data.rows});
+  }).catch((err) => {
+    console.log("error: ", err)
+    return
+  })
 })
 
 app.listen(process.env.PORT, host, (err) => {

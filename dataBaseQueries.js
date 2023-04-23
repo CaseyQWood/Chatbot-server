@@ -45,19 +45,35 @@ const UpdateDB = async (id, message) => {
   return response;
 }
 
-const SaveWinner = async (id, winner) => {
-  console.log("saveWinner: inside", id, " : " , winner)
-  const winnerContext = await pool.query(`
+const SaveWinner = async (id, username) => {
+  console.log("Inside SaveWinner: ", id, username)
+  const context = await pool.query(`
     SELECT message FROM messages
     WHERE id = $1;
     `, [id]
   );
 
-  const winnerJson = JSON.stringify({winner: winner, promptContext: winnerContext.rows[0].message.promptContext});
+  let winnerContext = context.rows[0].message.promptContext;
 
+  const promptLength = (winnerContext.length - 6) / 2;
+  const winnerJson = JSON.stringify({promptContext: winnerContext});
+
+  console.log("promptLength: ", promptLength, username)
   const response = await pool.query(`
-    INSERT INTO answers (id, answer)
-    VALUES (NEXTVAL('answers_id_seq'), $1)
-    RETURNING id ;`, [winnerJson]);
+    INSERT INTO answers (id, answer, number_of_prompts, user_name)
+    VALUES (NEXTVAL('answers_id_seq'), $1, $2, $3)
+    RETURNING id ;`, [winnerJson, promptLength, username]);
 }
-module.exports = {UpdateDB, NewInstance, SaveWinner}
+
+const GetTopWinners = async () => {
+  console.log("Inside DB Query")
+  const response = await pool.query(`
+    SELECT id, number_of_prompts, user_name FROM answers
+    WHERE number_of_prompts > 0
+    ORDER BY number_of_prompts DESC
+    LIMIT 10;
+  `);
+
+  return response;
+}
+module.exports = {UpdateDB, NewInstance, SaveWinner, GetTopWinners}
