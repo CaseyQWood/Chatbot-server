@@ -55,7 +55,7 @@ const SaveWinner = async (id, username) => {
 
   let winnerContext = context.rows[0].message.promptContext;
 
-  const promptLength = (winnerContext.length - 6) / 2;
+  const promptLength = Math.ceil((winnerContext.length - 6) / 2);
   const winnerJson = JSON.stringify({promptContext: winnerContext});
 
   console.log("promptLength: ", promptLength, username)
