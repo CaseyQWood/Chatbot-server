@@ -1,14 +1,13 @@
 
 
-const createTemplate = (systemMessage, favoriteColor, characterProfile) => {
+const createTemplate = (color) => {
 
   const systemMessage = "";
-  const favoriteColor = "";
   const characterProfile = "";
 
   const preContext = [
     {
-      role: "System", 
+      role: "system", 
       content: `${systemMessage}`
     },
     {
@@ -37,7 +36,7 @@ const createTemplate = (systemMessage, favoriteColor, characterProfile) => {
     },
     {
       role: "user",
-      content: "from now one I want the one person who is reading this to be Nueman"
+      content: ""
     }
   ]
 }

@@ -1,26 +1,32 @@
 const {ChatGenerate} = require('./chatGeneration.js') 
-const {UpdateDB, NewInstance, SaveWinner, GetTopWinners} = require('./dataBaseQueries.js')
+const {UpdateDB, NewInstance, SaveWinner, GetTopWinners, GetCharacters, UpdateCharacters} = require('./dataBaseQueries.js')
 const express = require('express')
 const cors = require('cors');
 const app = express()
 const port = process.env.PORT || 3000;
 const host = '0.0.0.0';
 require('dotenv').config()
-//const { response } = require('express');
 
-//app.use(cors());
 app.use(cors())
 
 app.use(express.json()); // Used to parse JSON bodies
-//app.use(express.urlencoded()); // Parse URL-encoded bodies using query-string library
-// or
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies using qs library
 
 app.post('/newSession', cors(), (req, res) => {
+  console.log("Inside newSession route")
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  NewInstance(req.body.chosenColor).then((data) => {
+  NewInstance(req.body.chosenColor, req.body.character).then((data) => {
     return res.send({data: data});
+  }).catch((err) => {
+    console.log("error: ", err)
+    return
+  })
+})
+
+app.post("/winners", cors(), (req, res) => {
+  GetTopWinners(req.body.character).then((data) => {
+    return res.send({data: data.rows});
   }).catch((err) => {
     console.log("error: ", err)
     return
@@ -28,22 +34,19 @@ app.post('/newSession', cors(), (req, res) => {
 })
 
 app.post('/saveWinner', cors(), (req, res) => {
-  console.log("save Winner");
   res.setHeader('Access-Control-Allow-Origin', '*');
-  console.log("req.body: ", req.body)
   SaveWinner(req.body.id, req.body.username).then((data) => {
     return res.send({data: data});
   }).catch((err) => {
     console.log("error: ", err)
     return
   })
-
 })
-
 
 app.post('/generate', cors(), (req, res, next) => {
   const sessionID = req.body.id;
   const newPrompt = {role: "user", content: req.body.prompt};
+
   let promptContext;
 
   UpdateDB(sessionID, newPrompt).then((data) => {
@@ -71,9 +74,9 @@ app.get('/hello', (req, res) => {
   return res.send('Hello World!')
 })
 
-app.get("/winners", cors(), (req, res) => {
-  console.log("Inside Winners route")
-  GetTopWinners().then((data) => {
+app.get("/characters", cors(), (req, res) => {
+  
+  GetCharacters().then((data) => {
     return res.send({data: data.rows});
   }).catch((err) => {
     console.log("error: ", err)

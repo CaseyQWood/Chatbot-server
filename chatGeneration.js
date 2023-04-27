@@ -1,4 +1,5 @@
 const { Configuration, OpenAIApi} = require("openai");
+const { Moderator } = require("./moderator");
 require('dotenv').config();
 
 const configuration = new Configuration({
@@ -8,6 +9,8 @@ const openai = new OpenAIApi(configuration);
 
 async function ChatGenerate(contextualPrompt) {
   if (!contextualPrompt) return "please enter a valid prompt"
+
+  //console.log(Moderator(contextualPrompt));
 
   promptJson = JSON.stringify(contextualPrompt.promptContext)  
   

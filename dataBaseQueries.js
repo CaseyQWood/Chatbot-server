@@ -3,6 +3,7 @@ require('dotenv').config();
 const preContext = require('./prompts/preContexts.js');
 const dennisNedryCheeky = require('./prompts/nedry.js');
 const {createDennis} = require('./prompts/DennisNedry.js');
+const {LoopBackPrompt} = require('./prompts/loopBack.js');
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -10,16 +11,22 @@ const pool = new Pool({
   connectionString,
 });
 
-const NewInstance = async (color) => {
-  const promptJson = JSON.stringify({promptContext: createDennis(color)});
+const NewInstance = async (color, name) => {
+  const response1 = await pool.query(`
+    SELECT * FROM characters
+    WHERE name = $1;
+    `, [name]
+  ); 
+
+  const promptJson = JSON.stringify({promptContext: response1.rows[0].context.promptContext});
 
   // updating the database with the new prompt context and returning the id
-  const response = await pool.query(`
-    INSERT INTO messages (id, message)
-    VALUES (NEXTVAL('messages_id_seq'), $1)
-    RETURNING id ;`, [promptJson]);
+  const response2 = await pool.query(`
+    INSERT INTO messages (id, message, character)
+    VALUES (NEXTVAL('messages_id_seq'), $1, $2)
+    RETURNING id ;`, [promptJson, name]);
     
-    return response.rows[0]; 
+    return response2.rows[0]; 
 }
 
 const UpdateDB = async (id, message) => {
@@ -45,8 +52,7 @@ const UpdateDB = async (id, message) => {
   return response;
 }
 
-const SaveWinner = async (id, username) => {
-  console.log("Inside SaveWinner: ", id, username)
+const SaveWinner = async (id, username, character) => {
   const context = await pool.query(`
     SELECT message FROM messages
     WHERE id = $1;
@@ -58,22 +64,43 @@ const SaveWinner = async (id, username) => {
   const promptLength = Math.ceil((winnerContext.length - 6) / 2);
   const winnerJson = JSON.stringify({promptContext: winnerContext});
 
-  console.log("promptLength: ", promptLength, username)
   const response = await pool.query(`
-    INSERT INTO answers (id, answer, number_of_prompts, user_name)
-    VALUES (NEXTVAL('answers_id_seq'), $1, $2, $3)
-    RETURNING id ;`, [winnerJson, promptLength, username]);
+    INSERT INTO answers (id, answer, number_of_prompts, user_name, character)
+    VALUES (NEXTVAL('answers_id_seq'), $1, $2, $3, $4)
+    RETURNING id ;`, [winnerJson, promptLength, username, character]);
 }
 
-const GetTopWinners = async () => {
-  console.log("Inside DB Query")
+const GetTopWinners = async (character) => {
   const response = await pool.query(`
-    SELECT id, number_of_prompts, user_name FROM answers
-    WHERE number_of_prompts > 0
+    SELECT id, number_of_prompts, user_name, character FROM answers
+    WHERE number_of_prompts > 0 AND character = $1
     ORDER BY number_of_prompts DESC
     LIMIT 10;
+    `, [character]
+  );
+
+  return response;
+}
+
+const GetCharacters = async () => {
+  const response = await pool.query(`
+    SELECT name FROM characters
   `);
 
   return response;
 }
-module.exports = {UpdateDB, NewInstance, SaveWinner, GetTopWinners}
+
+const UpdateCharacters = async () => {
+ let character = {promptContext: createDennis("Yellow")};
+  
+  const response = await pool.query(`
+    INSERT INTO characters
+    (id, context, name)
+    VALUES (NEXTVAL('messages_id_seq'), $1, $2)
+    RETURNING *;
+  `, [character, "Dennis Nedry"]);
+
+  return response;
+}
+
+module.exports = {UpdateDB, NewInstance, SaveWinner, GetTopWinners, GetCharacters, UpdateCharacters}
