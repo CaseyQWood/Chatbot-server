@@ -11,20 +11,22 @@ const pool = new Pool({
   connectionString,
 });
 
-const NewInstance = async (color, name) => {
+const NewInstance = async (name) => {
+  console.log("NewInstance name: ", name)
   const response1 = await pool.query(`
     SELECT * FROM characters
     WHERE name = $1;
     `, [name]
   ); 
 
+  //console.log("response1 TEST: ", response1.rows[0])
   const promptJson = JSON.stringify({promptContext: response1.rows[0].context.promptContext});
 
   // updating the database with the new prompt context and returning the id
   const response2 = await pool.query(`
-    INSERT INTO messages (id, message, character)
-    VALUES (NEXTVAL('messages_id_seq'), $1, $2)
-    RETURNING id ;`, [promptJson, name]);
+    INSERT INTO messages (id, message, character, fav_color)
+    VALUES (NEXTVAL('messages_id_seq'), $1, $2, $3)
+    RETURNING id, fav_color ;`, [promptJson, name, response1.rows[0].fav_color]);
     
     return response2.rows[0]; 
 }

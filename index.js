@@ -13,10 +13,10 @@ app.use(express.json()); // Used to parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies using qs library
 
 app.post('/newSession', cors(), (req, res) => {
-  console.log("Inside newSession route")
+  console.log("Inside newSession route: ", req.body)
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  NewInstance(req.body.chosenColor, req.body.character).then((data) => {
+  NewInstance(req.body.character).then((data) => {
     return res.send({data: data});
   }).catch((err) => {
     console.log("error: ", err)
