@@ -12,6 +12,12 @@ app.use(cors())
 app.use(express.json()); // Used to parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies using qs library
 
+function generatePrompt(prompt) {
+  const capitalizedPrompt =
+    prompt[0].toUpperCase() + prompt.slice(1).toLowerCase();
+  return `${capitalizedPrompt}.`;
+}
+
 app.post('/newSession', cors(), (req, res) => {
   console.log("Inside newSession route: ", req.body)
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -52,7 +58,8 @@ app.post('/generate', cors(), (req, res, next) => {
   UpdateDB(sessionID, newPrompt).then((data) => {
     promptContext = data.rows[0].message.promptContext;
     
-    ChatGenerate({promptContext}).then((data) => {
+    ChatGenerate({promptContext, character}).then((data) => {
+      //console.log("Chat data: ", data)
       let newResponse = {role: "assistant", content: generatePrompt(data)};
 
       UpdateDB(sessionID, newResponse).then((data) => {    
@@ -71,6 +78,7 @@ app.post('/generate', cors(), (req, res, next) => {
 
 app.get('/hello', (req, res) => {
   console.log("hello-World")
+  UpdateCharacters();
   return res.send('Hello World!')
 })
 
@@ -89,8 +97,3 @@ app.listen(process.env.PORT, host, (err) => {
   console.log(`Example app listening on port ${port}`)
 })
 
-function generatePrompt(prompt) {
-  const capitalizedPrompt =
-    prompt[0].toUpperCase() + prompt.slice(1).toLowerCase();
-  return `${capitalizedPrompt}.`;
-}

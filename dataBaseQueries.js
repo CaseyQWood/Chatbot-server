@@ -4,6 +4,7 @@ const preContext = require('./prompts/preContexts.js');
 const dennisNedryCheeky = require('./prompts/nedry.js');
 const {createDennis} = require('./prompts/DennisNedry.js');
 const {LoopBackPrompt} = require('./prompts/loopBack.js');
+const {BrennanPrompt} = require('./prompts/Brennan.js');
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -93,14 +94,15 @@ const GetCharacters = async () => {
 }
 
 const UpdateCharacters = async () => {
- let character = {promptContext: createDennis("Yellow")};
+  const color = "turquise";
+ let character = {promptContext: BrennanPrompt(color)};
   
   const response = await pool.query(`
     INSERT INTO characters
-    (id, context, name)
-    VALUES (NEXTVAL('messages_id_seq'), $1, $2)
+    (id, context, name, fav_color)
+    VALUES (NEXTVAL('messages_id_seq'), $1, $2, $3)
     RETURNING *;
-  `, [character, "Dennis Nedry"]);
+  `, [character, "Brennan", color]);
 
   return response;
 }
