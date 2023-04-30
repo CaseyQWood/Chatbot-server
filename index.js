@@ -58,7 +58,8 @@ app.post('/generate', cors(), (req, res, next) => {
   UpdateDB(sessionID, newPrompt).then((data) => {
     promptContext = data.rows[0].message.promptContext;
     
-    ChatGenerate({promptContext, character}).then((data) => {
+
+    ChatGenerate({promptContext}).then((data) => {
       //console.log("Chat data: ", data)
       let newResponse = {role: "assistant", content: generatePrompt(data)};
 

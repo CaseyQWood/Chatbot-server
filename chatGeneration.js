@@ -46,8 +46,8 @@ const newStr = str.replace("[" + numOfChar + "]", "").replace("[" + currentChar 
 return {newStr, numOfChar, currentChar}
 }
 
-async function ChatGenerate(contextualPrompt, character) {
-  console.log("ChatGenerate: ", character)
+async function ChatGenerate(contextualPrompt) {
+  //console.log("ChatGenerate: ", character)
   if (!contextualPrompt) return "please enter a valid prompt"
 
   //Moderator(contextualPrompt);
@@ -59,9 +59,9 @@ async function ChatGenerate(contextualPrompt, character) {
 
   let completionData = completion.data.choices[0].message
 
-  if (character === "Brennan") return CheckCharacters(completionData.content).newStr
+  return CheckCharacters(completionData.content).newStr
 
-  return completionData.content
+  //return completionData.content
   
 }
 
